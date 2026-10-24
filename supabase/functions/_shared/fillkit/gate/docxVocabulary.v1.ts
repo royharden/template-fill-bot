@@ -1,0 +1,18 @@
+// Gate-owned frozen package vocabulary. No dependency on the writer.
+export const DOCX_VOCABULARY_VERSION = 1;
+export const ZIP_LIMITS = { entries: 32, entry: 2 * 1024 * 1024, total: 5 * 1024 * 1024, compressed: 6 * 1024 * 1024 } as const;
+export const DOCX_PARTS = ['[Content_Types].xml', '_rels/.rels', 'word/document.xml', 'word/styles.xml', 'word/_rels/document.xml.rels', 'docProps/core.xml', 'docProps/app.xml'] as const;
+const X = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+export const WORD_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+const R = 'http://schemas.openxmlformats.org/package/2006/relationships';
+const O = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/';
+// Exact fixed metadata also closes every attribute, relationship and namespace outside document.xml.
+export const FIXED_PARTS: Readonly<Record<string, string>> = {
+  '[Content_Types].xml': `${X}<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/></Types>`,
+  '_rels/.rels': `${X}<Relationships xmlns="${R}"><Relationship Id="rId1" Type="${O}officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId3" Type="${O}extended-properties" Target="docProps/app.xml"/></Relationships>`,
+  'word/styles.xml': `${X}<w:styles xmlns:w="${WORD_NS}"><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style><w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/></w:style><w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="Heading 1"/><w:basedOn w:val="Normal"/></w:style><w:style w:type="paragraph" w:styleId="Appendix"><w:name w:val="Appendix"/><w:basedOn w:val="Normal"/></w:style></w:styles>`,
+  'word/_rels/document.xml.rels': `${X}<Relationships xmlns="${R}"><Relationship Id="rId1" Type="${O}styles" Target="styles.xml"/></Relationships>`,
+  'docProps/core.xml': `${X}<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:creator>template-fill-bot</dc:creator><cp:lastModifiedBy>template-fill-bot</cp:lastModifiedBy><dcterms:created xsi:type="dcterms:W3CDTF">2000-01-01T00:00:00Z</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">2000-01-01T00:00:00Z</dcterms:modified></cp:coreProperties>`,
+  'docProps/app.xml': `${X}<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"><Application>template-fill-bot</Application></Properties>`,
+};
+export const SECTION_XML = '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="720" w:footer="720" w:gutter="0"/></w:sectPr>';

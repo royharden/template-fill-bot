@@ -97,6 +97,11 @@ export class MemoryStore implements Store {
 
   appendApproval(approval: ApprovalRecord): Promise<void> {
     if (!this.matters.has(approval.matter_id)) return Promise.reject(new StoreError('not_found', 'matter not found'));
+    const revisions = this.states.get(approval.matter_id);
+    const latestState = revisions === undefined || revisions.size === 0 ? undefined : revisions.get(Math.max(...revisions.keys()));
+    if (!Number.isSafeInteger(approval.revision) || approval.revision < 1 || latestState === undefined || approval.revision !== latestState.revision || !/^[a-f0-9]{64}$/.test(approval.bundle_digest) || !/^[a-f0-9]{64}$/.test(approval.library_hash) || !approval.approver.trim() || !approval.approved_at) {
+      return Promise.reject(new StoreError('invalid', 'approval must bind the current persisted revision and valid hashes'));
+    }
     this.approvals.push(copy(approval));
     return Promise.resolve();
   }

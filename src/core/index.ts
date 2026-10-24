@@ -7,3 +7,7 @@ export { CLAUSES } from '../../supabase/functions/_shared/content/clauses.ts';
 export { FRAME } from '../../supabase/functions/_shared/content/frame.ts';
 export { JURISDICTION } from '../../supabase/functions/_shared/content/jurisdiction.ts';
 export { LIBRARY_LOCK } from '../../supabase/functions/_shared/content/library.lock.ts';
+export * from '../../supabase/functions/_shared/docx/writeDocx.ts';
+export * from '../../supabase/functions/_shared/fillkit/gate/gate.ts';
+export * from '../../supabase/functions/_shared/fillkit/bundle.ts';
+export * from '../../supabase/functions/_shared/rulings/approvals.ts';
