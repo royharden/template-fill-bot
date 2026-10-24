@@ -16,7 +16,7 @@ import { ReviewScreen } from './ReviewScreen.tsx';
 const EMPTY_LIVE: LiveControls = { session: null, store: null, providerLabel: 'the configured extraction provider' };
 const emptyMessages = (): IntakeMessageInput[] => [{ id: 'm1', text: '' }];
 
-export function App({ live = EMPTY_LIVE }: { readonly live?: LiveControls }) {
+export function App({ live = EMPTY_LIVE, onLiveChange }: { readonly live?: LiveControls; readonly onLiveChange?: (active: boolean) => void }) {
   const [demoStore] = useState(() => new MemoryStore());
   const [mode, setMode] = useState<'demo' | 'live'>('demo');
   const [method, setMethod] = useState<'mock' | 'regex' | 'llm' | 'jev'>('mock');
@@ -40,6 +40,7 @@ export function App({ live = EMPTY_LIVE }: { readonly live?: LiveControls }) {
   const [consentKey, setConsentKey] = useState<string | null>(null);
   const actionLock = useRef(false);
   const generation = useRef(0);
+  const scopeGeneration = useRef(0);
   const store = mode === 'demo' ? demoStore : live.store;
   const liveReady = Boolean(liveConfigured && live.session && live.store && live.extract);
   const providerKey = `${live.session?.userId ?? ''}:${live.providerLabel}`;
@@ -48,6 +49,7 @@ export function App({ live = EMPTY_LIVE }: { readonly live?: LiveControls }) {
   // through between a changed session render and the cleanup effect below.
   if (activeScope.current.mode !== mode || activeScope.current.store !== store || (mode === 'live' && (activeScope.current.userId !== live.session?.userId || activeScope.current.providerLabel !== live.providerLabel))) {
     generation.current += 1;
+    scopeGeneration.current += 1;
     activeScope.current = { mode, store, userId: live.session?.userId, providerLabel: live.providerLabel };
   }
   const view = state ? deriveView(state) : null;
@@ -61,11 +63,16 @@ export function App({ live = EMPTY_LIVE }: { readonly live?: LiveControls }) {
   function clearReview(): void {
     invalidate(); setState(null); setSelected(null); setDirty(true); setUnsavedAnswers(false);
   }
-  // An actual auth transition clears retained live review, including in-flight results.
+  function clearScope(): void {
+    clearReview(); setMatterId(null); setMatters([]); setConsentKey(null);
+    setMessages(emptyMessages()); setImportText(''); setApprover(''); setError(null);
+    setFormEpoch((value) => value + 1);
+  }
+  // Clear both saved-review views and unsaved editor buffers when the live account scope changes.
   useEffect(() => {
     if (mode !== 'live') return;
-    generation.current += 1;
-    setBundle(null); setApproval(null); setGateResult(null); setState(null); setMatterId(null); setDirty(true); setMatters([]); setConsentKey(null); setUnsavedAnswers(false);
+    clearScope();
+    setNotice(live.session ? 'Signed in. Confirm the provider disclosure before live extraction.' : 'Sign in and confirm the provider disclosure before live extraction.');
   }, [mode, live.session?.userId, live.store, live.providerLabel]);
 
   async function refreshMatters(): Promise<void> {
@@ -77,13 +84,15 @@ export function App({ live = EMPTY_LIVE }: { readonly live?: LiveControls }) {
   async function action(work: () => Promise<void>): Promise<void> {
     if (actionLock.current) return;
     actionLock.current = true; setBusy(true); setError(null);
+    const scopeTicket = scopeGeneration.current;
     try { await work(); }
-    catch (cause) { setError(cause instanceof Error ? cause.message : 'The action could not be completed.'); }
+    catch (cause) { if (scopeTicket === scopeGeneration.current) setError(cause instanceof Error ? cause.message : 'The action could not be completed.'); }
     finally { actionLock.current = false; setBusy(false); }
   }
   function chooseMode(next: 'demo' | 'live'): void {
     if (next === mode) return;
-    clearReview(); setMatterId(null); setMatters([]); setConsentKey(null); setMessages(emptyMessages()); setMode(next); setMethod(next === 'demo' ? 'mock' : 'llm');
+    onLiveChange?.(next === 'live');
+    clearScope(); setMode(next); setMethod(next === 'demo' ? 'mock' : 'llm');
     setNotice(next === 'demo' ? 'Demo mode is local and in memory.' : 'Sign in and confirm the provider disclosure before live extraction.');
   }
   function editMessages(next: readonly IntakeMessageInput[]): void {
@@ -91,7 +100,8 @@ export function App({ live = EMPTY_LIVE }: { readonly live?: LiveControls }) {
     setNotice('Intake changed. Previous downloads are disabled. Extract to save a new canonical revision.');
   }
   function loadDemo(id: string): void {
-    clearReview(); setMode('demo'); setMethod('mock'); setScenario(id); setMessages(DEMOS[id].messages); setMatterId(null); setMatters([]);
+    onLiveChange?.(false);
+    clearScope(); setMode('demo'); setMethod('mock'); setScenario(id); setMessages(DEMOS[id].messages);
     setNotice(`${id} loaded. Extract to find its questions and grounded evidence.`);
   }
   async function extract(): Promise<void> {
@@ -151,7 +161,10 @@ export function App({ live = EMPTY_LIVE }: { readonly live?: LiveControls }) {
     const ticket = generation.current;
     const row = await approveBundle(store, matterId, bundle, mode === 'live' ? live.session!.userId : approver.trim());
     if (ticket !== generation.current) return;
-    setApproval(row); setNotice('This exact revision and digest are approved. Downloads recheck the canonical saved state.');
+    const recorded = mode === 'live' ? (await store.listApprovals(matterId)).filter((entry) => approvalMatches(entry, bundle, matterId, state.revision)).at(-1) : row;
+    if (ticket !== generation.current) return;
+    if (!recorded) throw new Error('Server approval receipt is missing.');
+    setApproval(recorded); setNotice('This exact revision and digest are approved. Downloads recheck the canonical saved state.');
   }
   async function download(filename: BundleFilename): Promise<void> {
     if (!bundle || !store || !matterId || dirty || unsavedAnswers) throw new Error('Current approved bundle required.');
