@@ -1,0 +1,4 @@
+project_id = "template-fill-bot"
+
+[functions.extract-fields]
+verify_jwt = true
