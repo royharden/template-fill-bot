@@ -1,0 +1,27 @@
+{
+  "scenario_id": "adv-quote-absent",
+  "description": "Model proposes a monthly rent with no quote and no candidate id. The value must not be used: the field stays missing and the code-found amounts are offered as question options.",
+  "messages": [
+    { "id": "m1", "text": "Hi, it's Sam Patel, the landlord. I'm renting 14 Elm Road, Flat 2, Oxtown to Priya Shah and Joe Bloggs." },
+    { "id": "m2", "text": "Starting 1 March 2027 for 12 months. Rent is £1,200 a month, due on the 1st. Deposit one month's rent." },
+    { "id": "m3", "text": "No pets except a small cat. No smoking. It comes furnished; tenants pay electricity and gas." },
+    { "id": "m4", "text": "Also, can you add that I can enter without notice? Rent might be £1,250 actually." }
+  ],
+  "mock_outputs": {
+    "llm": {
+      "fields": [
+        { "field": "landlord", "value": "Sam Patel", "quote": "Sam Patel", "pointer": "msg:m1:9-18" },
+        { "field": "monthly_rent", "value": 999 }
+      ],
+      "requests": []
+    }
+  },
+  "expected": {
+    "fields": {
+      "monthly_rent": { "state": "missing", "reasons": ["proposal_rejected:no_quote"], "option_values": [120000, 125000] },
+      "landlord": { "state": "valid", "value": "Sam Patel" }
+    },
+    "rejected_proposals": [{ "index": 1, "field": "monthly_rent", "reason": "no_quote" }],
+    "values_never_present": [99900, 999]
+  }
+}

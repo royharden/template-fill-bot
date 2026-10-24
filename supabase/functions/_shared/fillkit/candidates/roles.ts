@@ -1,7 +1,7 @@
 // Role candidates (PLAN section 4.4 role grammar; the regex baseline uses the same grammar):
 //   landlord:  `landlord: X` | `landlord is X` | `X, the landlord` | `it's X, the landlord`
 //   tenants:   `tenants: X` | `rent(s) [<address>] to X and Y` | `renting <address> to X and Y`
-//   guarantor: `guarantor: X` | `guarantor is X`
+//   guarantor: `guarantor: X` | `guarantor is X` | unresolved `guarantor for <tenant> only`
 //   address:   `property: X` | `address: X` | `property at X` | `property/address is (at) X` | `renting <address> to`
 // Payload rule: a payload that FOLLOWS its cue is trimmed and ends before the first `.` `!` `?` `;` or
 // newline after it; the terminator is never part of the value, quote or pointer span.
@@ -51,6 +51,11 @@ const IS_RE = new RegExp(
   `(?<!\\p{L})(?:${ci('the')}\\s+)?(${ci('landlord')}|${ci('guarantor')}|${ci('property')}|${ci('address')})\\s+${ci('is')}\\s+(?:${ci('at')}\\s+)?(?=[\\p{Lu}0-9])`,
   'gu',
 );
+/** `guarantor for <tenant> only`: an optional-term cue without a guarantor name, never a value. */
+const GUARANTOR_FOR_RE = new RegExp(
+  `(?<!\\p{L})${ci('guarantor')}\\s+(?=${ci('for')}(?!\\p{L}))`,
+  'gu',
+);
 /** `property at X` */
 const PROPERTY_AT_RE = new RegExp(`(?<!\\p{L})${ci('property')}\\s+${ci('at')}\\s+(?=[\\p{Lu}0-9])`, 'gu');
 /** `X, the landlord` (X runs back to the previous terminator or comma); groups: 1 leading spaces, 2 X. */
@@ -66,7 +71,7 @@ const RENT_TO_RE = new RegExp(
   'gu',
 );
 /** A guarantor payload that names only some tenants ("for Joe only") is ambiguous. */
-const PARTIAL_GUARANTEE_RE = /(?<!\p{L})(?:for|only)(?!\p{L})/u;
+const PARTIAL_GUARANTEE_RE = /(?<!\p{L})(?:for|only)(?!\p{L})/iu;
 
 interface RoleHit {
   readonly field: FieldKey;
@@ -92,6 +97,10 @@ function roleHits(text: string): RoleHit[] {
     if (field === undefined) continue;
     const span = followingPayload(text, (m.index ?? 0) + m[0].length);
     if (span !== null) hits.push({ field, span });
+  }
+  for (const m of text.matchAll(GUARANTOR_FOR_RE)) {
+    const span = followingPayload(text, (m.index ?? 0) + m[0].length);
+    if (span !== null) hits.push({ field: 'guarantor', span });
   }
   for (const m of text.matchAll(PROPERTY_AT_RE)) {
     const span = followingPayload(text, (m.index ?? 0) + m[0].length);

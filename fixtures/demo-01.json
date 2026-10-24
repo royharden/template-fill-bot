@@ -1,0 +1,203 @@
+{
+  "scenario_id": "demo-01",
+  "source": "PLAN section 4.8a (Claude plan messages): rent conflict, pets ambiguous with a 'small cat' residual, relative deposit, utilities completion, optional-terms confirmation, enter-without-notice request.",
+  "note": "Illustrative, invented people and places. Pointers are end-exclusive UTF-16 offsets into the normalised messages (all characters here are in the BMP; normalisation changes nothing).",
+  "messages": [
+    { "id": "m1", "text": "Hi, it's Sam Patel, the landlord. I'm renting 14 Elm Road, Flat 2, Oxtown to Priya Shah and Joe Bloggs." },
+    { "id": "m2", "text": "Starting 1 March 2027 for 12 months. Rent is £1,200 a month, due on the 1st. Deposit one month's rent." },
+    { "id": "m3", "text": "No pets except a small cat. No smoking. It comes furnished; tenants pay electricity and gas." },
+    { "id": "m4", "text": "Also, can you add that I can enter without notice? Rent might be £1,250 actually." }
+  ],
+  "mock_outputs": {
+    "llm": {
+      "fields": [
+        { "field": "landlord", "value": "Sam Patel", "quote": "Sam Patel", "pointer": "msg:m1:9-18" },
+        { "field": "tenants", "value": ["Priya Shah", "Joe Bloggs"], "quote": "Priya Shah and Joe Bloggs", "pointer": "msg:m1:77-102" },
+        { "field": "address", "value": "14 Elm Road, Flat 2, Oxtown", "quote": "14 Elm Road, Flat 2, Oxtown", "pointer": "msg:m1:46-73" },
+        { "field": "start_date", "value": "2027-03-01", "quote": "1 March 2027", "pointer": "msg:m2:9-21" },
+        { "field": "term_months", "value": 12, "quote": "12 months", "pointer": "msg:m2:26-35" },
+        { "field": "monthly_rent", "value": "£1,250", "quote": "£1,250", "pointer": "msg:m4:65-71" },
+        { "field": "rent_due_day", "value": 1, "quote": "due on the 1st", "pointer": "msg:m2:61-75" },
+        { "field": "deposit", "value": "one month's rent", "quote": "one month's rent", "pointer": "msg:m2:85-101" },
+        { "field": "pets", "value": "none", "quote": "No pets except a small cat", "pointer": "msg:m3:0-26" },
+        { "field": "smoking", "value": "prohibited", "quote": "No smoking", "pointer": "msg:m3:28-38" },
+        { "field": "furnished", "value": "furnished", "quote": "It comes furnished", "pointer": "msg:m3:40-58" },
+        { "field": "utilities", "value": ["electricity", "gas"], "quote": "tenants pay electricity and gas", "pointer": "msg:m3:60-91" }
+      ],
+      "requests": [
+        { "quote": "Also, can you add that I can enter without notice", "pointer": "msg:m4:0-49", "clause_id": null }
+      ]
+    }
+  },
+  "expected": {
+    "before_answers": {
+      "revision": 1,
+      "field_states": {
+        "landlord": "valid",
+        "tenants": "valid",
+        "address": "valid",
+        "start_date": "valid",
+        "term_months": "valid",
+        "end_date": "valid",
+        "monthly_rent": "conflict",
+        "rent_due_day": "valid",
+        "deposit": "missing",
+        "pets": "ambiguous",
+        "smoking": "valid",
+        "furnished": "valid",
+        "utilities": "ambiguous",
+        "guarantor": "missing",
+        "break_month": "missing"
+      },
+      "field_values": {
+        "landlord": "Sam Patel",
+        "tenants": ["Priya Shah", "Joe Bloggs"],
+        "address": "14 Elm Road, Flat 2, Oxtown",
+        "start_date": "2027-03-01",
+        "term_months": 12,
+        "end_date": "2028-02-29",
+        "rent_due_day": 1,
+        "smoking": "prohibited",
+        "furnished": "furnished"
+      },
+      "field_reasons": {
+        "monthly_rent": ["conflicting_values"],
+        "deposit": ["pending_dependency"],
+        "pets": ["ambiguous"],
+        "utilities": ["utilities_incomplete"],
+        "guarantor": ["no_proposal"],
+        "break_month": ["no_proposal"]
+      },
+      "questions": ["q.monthly_rent.v1", "q.pets.v1", "q.utilities.v1", "q.optional_terms.v1"],
+      "question_options": {
+        "q.monthly_rent.v1": [120000, 125000],
+        "q.pets.v1": ["none", "with_consent"],
+        "q.utilities.v1": [["electricity", "gas"], ["water", "electricity", "gas", "internet"]],
+        "q.optional_terms.v1": [null]
+      },
+      "optional_terms_fields": ["guarantor", "break_month"],
+      "not_included": [
+        { "reason": "pets_qualifier", "clause_id": null, "quote": "a small cat", "pointer": "msg:m3:15-26" },
+        { "reason": "no_supported_clause", "clause_id": null, "quote": "Also, can you add that I can enter without notice", "pointer": "msg:m4:0-49" }
+      ],
+      "accepted_clause_ids": [],
+      "render_blocked_reasons": [
+        "field_conflict:monthly_rent",
+        "field_missing:deposit",
+        "field_ambiguous:pets",
+        "field_ambiguous:utilities",
+        "field_missing:guarantor",
+        "field_missing:break_month",
+        "question_open:q.monthly_rent.v1",
+        "question_open:q.pets.v1",
+        "question_open:q.utilities.v1",
+        "question_open:q.optional_terms.v1"
+      ]
+    },
+    "answers": [
+      { "question_id": "q.monthly_rent.v1", "answer": { "kind": "text", "text": "£1,200" } },
+      { "question_id": "q.pets.v1", "answer": { "kind": "option", "option_id": "o2" } },
+      { "question_id": "q.utilities.v1", "answer": { "kind": "text", "text": "electricity and gas" } },
+      { "question_id": "q.optional_terms.v1", "answer": { "kind": "none" } }
+    ],
+    "after_answers": {
+      "revision": 5,
+      "field_states": {
+        "landlord": "valid",
+        "tenants": "valid",
+        "address": "valid",
+        "start_date": "valid",
+        "term_months": "valid",
+        "end_date": "valid",
+        "monthly_rent": "valid",
+        "rent_due_day": "valid",
+        "deposit": "valid",
+        "pets": "valid",
+        "smoking": "valid",
+        "furnished": "valid",
+        "utilities": "valid",
+        "guarantor": "none_confirmed",
+        "break_month": "none_confirmed"
+      },
+      "field_values": {
+        "landlord": "Sam Patel",
+        "tenants": ["Priya Shah", "Joe Bloggs"],
+        "address": "14 Elm Road, Flat 2, Oxtown",
+        "start_date": "2027-03-01",
+        "term_months": 12,
+        "end_date": "2028-02-29",
+        "monthly_rent": 120000,
+        "rent_due_day": 1,
+        "deposit": 120000,
+        "pets": "with_consent",
+        "smoking": "prohibited",
+        "furnished": "furnished",
+        "utilities": ["electricity", "gas"]
+      },
+      "field_methods": {
+        "landlord": "mock",
+        "tenants": "mock",
+        "address": "mock",
+        "start_date": "mock",
+        "term_months": "mock",
+        "end_date": "computed",
+        "monthly_rent": "user_answer",
+        "rent_due_day": "mock",
+        "deposit": "mock",
+        "pets": "user_answer",
+        "smoking": "mock",
+        "furnished": "mock",
+        "utilities": "user_answer",
+        "guarantor": "none_confirmed",
+        "break_month": "none_confirmed"
+      },
+      "questions": [],
+      "clause_ids": [
+        "parties",
+        "joint-and-several",
+        "property",
+        "furnished-inventory",
+        "term",
+        "rent",
+        "rent-payment",
+        "utilities-tenant-pays",
+        "utilities-included-in-rent",
+        "deposit",
+        "deposit-return",
+        "use-of-property",
+        "pets-with-landlord-consent",
+        "smoking-prohibited",
+        "repairs-tenant",
+        "repairs-landlord",
+        "access-with-notice",
+        "quiet-enjoyment",
+        "ending-tenancy",
+        "notices"
+      ],
+      "not_included": [
+        { "reason": "pets_qualifier", "clause_id": null, "quote": "a small cat", "pointer": "msg:m3:15-26" },
+        { "reason": "no_supported_clause", "clause_id": null, "quote": "Also, can you add that I can enter without notice", "pointer": "msg:m4:0-49" }
+      ],
+      "markdown_contains": [
+        "This agreement is made between Sam Patel (the Landlord) and Priya Shah and Joe Bloggs (the Tenant).",
+        "The tenancy is for a fixed term of 12 months, starting on 1 March 2027 and ending on 29 February 2028.",
+        "The rent is £1,200.00 per month.",
+        "on the 1st day of each month",
+        "The Tenant will pay a deposit of £1,200.00 before the tenancy starts.",
+        "the tenancy: electricity and gas.",
+        "paid for by the Landlord: water and internet.",
+        "2 requests were not included; see provenance file."
+      ],
+      "markdown_excludes": [
+        "enter without notice",
+        "a small cat",
+        "one month's rent",
+        "£1,200 a month",
+        "£1,250",
+        "No pets except",
+        "tenants pay electricity and gas",
+        "due on the 1st"
+      ]
+    }
+  }
+}
