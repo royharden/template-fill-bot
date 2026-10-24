@@ -43,7 +43,9 @@ describe('M4 canonical matter JSON interchange (source only)', () => {
   });
   it('requires coherent revision lineage and optional-term confirmation', async () => {
     const state = await resolvedDemo();
-    expect(()=>validateMatterState({...state,revision:state.revision+1})).toThrow('matter_revision_lineage');
+    // Intake revisions need not have a corresponding answer event, but events cannot exceed the head.
+    expect(validateMatterState({...state,revision:state.revision+1}).revision).toBe(state.revision+1);
+    expect(()=>validateMatterState({...state,revision:state.revision-1})).toThrow('matter_revision_lineage');
     expect(()=>validateMatterState({...state,answers:[]})).toThrow('matter_answer_log');
     expect(()=>validateMatterState({...state,fields:{...state.fields,landlord:{...state.fields.landlord,state:'none_confirmed',value:undefined}}})).toThrow();
   });

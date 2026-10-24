@@ -68,8 +68,11 @@ export function validateMatterState(input: unknown): MatterState {
   const requestIds = new Set<string>();
   for (const r of [...state.request_items, ...state.residuals]) { checkSpan(r); if (requestIds.has(r.id)) invalid('matter_request_duplicate'); requestIds.add(r.id); }
   const revisions = [...state.answers.map((a) => a.revision), ...state.confirmations.map((c) => c.revision)].sort((a,b) => a-b);
-  if (revisions.length !== state.revision - 1 || revisions.some((r,i) => r !== i + 2)) invalid('matter_revision_lineage');
+  // Intake edits/re-extraction also create revisions, without inventing answer/confirmation events.
+  // Gaps are legitimate; event revisions must still be positive, unique, ordered within each log and bounded.
+  if (revisions.some((r,i) => !Number.isSafeInteger(r) || r < 2 || r > state.revision || (i > 0 && revisions[i-1] === r))) invalid('matter_revision_lineage');
   if (state.answers.some((a,i) => new Set(a.fields).size !== a.fields.length || (i && state.answers[i-1].revision >= a.revision))) invalid('matter_answer_order');
+  if (state.confirmations.some((c,i) => i > 0 && state.confirmations[i-1].revision >= c.revision)) invalid('matter_confirmation_order');
   const confirmed = new Set<string>();
   for (const c of state.confirmations) { if (!state.request_items.some((r) => r.id === c.request_id) || confirmed.has(c.request_id)) invalid('matter_confirmation'); confirmed.add(c.request_id); }
   // Return a detached canonical copy; no caller-owned mutable array survives validation.
