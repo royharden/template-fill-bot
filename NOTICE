@@ -1,0 +1,22 @@
+template-fill-bot
+Copyright (c) 2026 Roy Harden. Licensed under the MIT License (see LICENSE).
+
+Clause library, frame text and jurisdiction values (supabase/functions/_shared/content/) are
+self-authored, illustrative, and released under the same MIT licence. They are invented example
+text and values, not any real law, and not legal advice. No template or clause text was copied
+from any other project or publication.
+
+Third-party runtime dependencies (bundled into the app or the Edge Function). Licences below are
+EXPECTED, NOT YET CONFIRMED: nothing has been installed in Dirty Mode. Confirm each licence from
+the installed package at DV-INSTALL (docs/DEFERRED-VALIDATION.md) and update this file.
+
+| Package               | Pinned version | Licence (expected)                        | Use                          |
+|-----------------------|----------------|-------------------------------------------|------------------------------|
+| zod                   | 3.23.8         | MIT, to confirm at DV-INSTALL             | schema validation            |
+| fflate                | 0.8.2          | MIT, to confirm at DV-INSTALL             | deterministic zip for DOCX   |
+| @supabase/supabase-js | 2.45.4         | MIT, to confirm at DV-INSTALL             | auth, database, functions    |
+| react                 | 18.3.1         | MIT, to confirm at DV-INSTALL             | user interface               |
+| react-dom             | 18.3.1         | MIT, to confirm at DV-INSTALL             | user interface               |
+
+Development-only tools (typescript, vite, @vitejs/plugin-react, vitest, tsx, eslint,
+typescript-eslint, @types/*) are not distributed with the app; list them here too if that changes.

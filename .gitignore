@@ -1,0 +1,22 @@
+# Secrets and local environment
+.env*
+!.env.example
+
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+.vite/
+
+# Evaluation cache and local budget ledger/state (eval/budget/README.md stays tracked)
+results/cache/
+eval/budget/*.json*
+
+# Logs and OS clutter
+*.log
+.DS_Store
+Thumbs.db
+
+# Agent scratch must never enter the product repo
+.thinking/
+.agent-work/
