@@ -19,7 +19,7 @@
 | Build/output | `npm run build` → `dist/`; unexecuted |
 | Type/lint/tests | `npm run typecheck`, `npm run lint`, `npm test`; all pending; edge additionally `deno check --config supabase/functions/extract-fields/deno.json supabase/functions/extract-fields/index.ts` |
 | Client/public configuration | `src/lib/supabase.ts`; `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` only |
-| Missing configuration | Default demo works in memory without initializing a client/auth/network; explicit Live shows setup guidance; missing live configuration fails without fabricated output |
+| Missing configuration | Default demo path is authored to use memory without initializing a client/auth/network; explicit Live shows setup guidance; missing live configuration fails without fabricated output |
 | Content activation | Authorized `npm run lock`, review/commit generated lock; never auto-relock at runtime |
 
 ## Database
