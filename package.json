@@ -16,6 +16,7 @@
     "test": "vitest run",
     "lock": "tsx scripts/lock.ts",
     "eval": "tsx scripts/eval.ts",
+    "gen-gold": "tsx scripts/gen-gold.ts",
     "demo": "tsx scripts/demo.ts",
     "syntax-check": "node scripts/syntax-check.mjs"
   },

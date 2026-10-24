@@ -1,0 +1,1 @@
+{"id":"adversarial-duplicate-offset","messages":[{"id":"m1","text":"Landlord: Aster Vale. Agent: Aster Vale."}],"output":{"fields":[{"field":"landlord","quote":"Aster Vale","pointer":"msg:m1:29-39"}],"requests":[]},"expected":{"field":"landlord","not_valid":true,"diagnostic":"rejected_proposals"}}

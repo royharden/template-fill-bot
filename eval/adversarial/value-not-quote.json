@@ -1,0 +1,1 @@
+{"id":"adversarial-value-not-quote","messages":[{"id":"m1","text":"Monthly rent: GBP 1200."}],"output":{"fields":[{"field":"monthly_rent","value":999999,"quote":"GBP 1200"}],"requests":[]},"expected":{"field":"monthly_rent","not_valid":true,"diagnostic":"field_invalid"}}

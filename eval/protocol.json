@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "seed": 3007,
+  "bootstrap_iterations": 2000,
+  "methods": ["regex", "llm", "jev", "free_draft_blind", "free_draft_library", "mock"],
+  "llm_provider": "openai_compatible",
+  "llm_model": "UNCONFIGURED",
+  "jev_model": "jev-1.13.0",
+  "max_output_tokens": 4096,
+  "timeout_ms": 20000,
+  "retries": 0,
+  "option_order_seed": 3007,
+  "thresholds": { "jev_default": false, "wrong_fill_nonincrease_both_baselines": true },
+  "note": "Edit only on dev; freeze pins these exact bytes. Live prices intentionally absent until a current provider review."
+}

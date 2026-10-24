@@ -1,0 +1,1 @@
+{"id":"adversarial-unknown-clause","messages":[{"id":"m1","text":"Please add clause 99."}],"output":{"fields":[],"requests":[{"quote":"Please add clause 99.","clause_id":"clause-99"}]},"expected":{"diagnostic":"not_included"}}
