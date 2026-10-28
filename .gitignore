@@ -20,3 +20,12 @@ Thumbs.db
 # Agent scratch must never enter the product repo
 .thinking/
 .agent-work/
+
+# Local credentials and archive artifacts
+.creds/
+ArchiveManager-creds.txt
+*.pem
+*.key
+*.p12
+*.pfx
+*.zip
