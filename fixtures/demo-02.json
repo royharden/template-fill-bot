@@ -1,0 +1,199 @@
+{
+  "scenario_id": "demo-02",
+  "source": "PLAN section 4.8a (Codex plan messages): labelled phrasing, rent conflict, ambiguous numeric start date 03/04/2027, utilities completion, optional-terms confirmation, enter-without-notice request.",
+  "note": "Illustrative, invented people and places. 'GBP 1200' occurs twice in m2, so the deposit proposal needs its explicit pointer (second occurrence, msg:m2:76-84).",
+  "messages": [
+    { "id": "m1", "text": "Landlord: Sam Vale. Tenants: Priya Reed and Joe Lake. Property: 12 Willow Lane" },
+    { "id": "m2", "text": "Start 03/04/2027, term 12 months. Rent GBP 1200 monthly, due day 1. Deposit GBP 1200" },
+    { "id": "m3", "text": "Actually monthly rent GBP 1250. Pets allowed. Smoking prohibited. Furnished yes" },
+    { "id": "m4", "text": "Utilities: water included. Can the landlord enter without notice?" }
+  ],
+  "mock_outputs": {
+    "llm": {
+      "fields": [
+        { "field": "landlord", "value": "Sam Vale", "quote": "Sam Vale", "pointer": "msg:m1:10-18" },
+        { "field": "tenants", "value": ["Priya Reed", "Joe Lake"], "quote": "Priya Reed and Joe Lake", "pointer": "msg:m1:29-52" },
+        { "field": "address", "value": "12 Willow Lane", "quote": "12 Willow Lane", "pointer": "msg:m1:64-78" },
+        { "field": "start_date", "value": "2027-03-04", "quote": "03/04/2027", "pointer": "msg:m2:6-16" },
+        { "field": "term_months", "value": 12, "quote": "12 months", "pointer": "msg:m2:23-32" },
+        { "field": "monthly_rent", "value": 1200, "quote": "GBP 1200 monthly", "pointer": "msg:m2:39-55" },
+        { "field": "monthly_rent", "value": 1250, "quote": "GBP 1250", "pointer": "msg:m3:22-30" },
+        { "field": "rent_due_day", "value": 1, "quote": "due day 1", "pointer": "msg:m2:57-66" },
+        { "field": "deposit", "value": 1200, "quote": "GBP 1200", "pointer": "msg:m2:76-84" },
+        { "field": "pets", "value": "with_consent", "quote": "Pets allowed", "pointer": "msg:m3:32-44" },
+        { "field": "smoking", "value": "prohibited", "quote": "Smoking prohibited", "pointer": "msg:m3:46-64" },
+        { "field": "furnished", "value": "furnished", "quote": "Furnished yes", "pointer": "msg:m3:66-79" },
+        { "field": "utilities", "value": [], "quote": "Utilities: water included", "pointer": "msg:m4:0-25" }
+      ],
+      "requests": [
+        { "quote": "Can the landlord enter without notice", "pointer": "msg:m4:27-64", "clause_id": null }
+      ]
+    }
+  },
+  "expected": {
+    "before_answers": {
+      "revision": 1,
+      "field_states": {
+        "landlord": "valid",
+        "tenants": "valid",
+        "address": "valid",
+        "start_date": "ambiguous",
+        "term_months": "valid",
+        "end_date": "missing",
+        "monthly_rent": "conflict",
+        "rent_due_day": "valid",
+        "deposit": "valid",
+        "pets": "valid",
+        "smoking": "valid",
+        "furnished": "valid",
+        "utilities": "ambiguous",
+        "guarantor": "missing",
+        "break_month": "missing"
+      },
+      "field_values": {
+        "landlord": "Sam Vale",
+        "tenants": ["Priya Reed", "Joe Lake"],
+        "address": "12 Willow Lane",
+        "term_months": 12,
+        "rent_due_day": 1,
+        "deposit": 120000,
+        "pets": "with_consent",
+        "smoking": "prohibited",
+        "furnished": "furnished"
+      },
+      "field_reasons": {
+        "start_date": ["ambiguous_date"],
+        "end_date": ["pending_dependency"],
+        "monthly_rent": ["conflicting_values"],
+        "utilities": ["utilities_incomplete"],
+        "guarantor": ["no_proposal"],
+        "break_month": ["no_proposal"]
+      },
+      "questions": ["q.start_date.v1", "q.monthly_rent.v1", "q.utilities.v1", "q.optional_terms.v1"],
+      "question_options": {
+        "q.start_date.v1": ["2027-04-03", "2027-03-04"],
+        "q.monthly_rent.v1": [120000, 125000],
+        "q.utilities.v1": [[], ["electricity", "gas", "internet"]],
+        "q.optional_terms.v1": [null]
+      },
+      "optional_terms_fields": ["guarantor", "break_month"],
+      "not_included": [
+        { "reason": "no_supported_clause", "clause_id": null, "quote": "Can the landlord enter without notice", "pointer": "msg:m4:27-64" }
+      ],
+      "accepted_clause_ids": [],
+      "render_blocked_reasons": [
+        "field_ambiguous:start_date",
+        "field_missing:end_date",
+        "field_conflict:monthly_rent",
+        "field_ambiguous:utilities",
+        "field_missing:guarantor",
+        "field_missing:break_month",
+        "question_open:q.start_date.v1",
+        "question_open:q.monthly_rent.v1",
+        "question_open:q.utilities.v1",
+        "question_open:q.optional_terms.v1"
+      ]
+    },
+    "answers": [
+      { "question_id": "q.start_date.v1", "answer": { "kind": "option", "option_id": "o1" } },
+      { "question_id": "q.monthly_rent.v1", "answer": { "kind": "text", "text": "GBP 1250" } },
+      { "question_id": "q.utilities.v1", "answer": { "kind": "text", "text": "electricity, gas and internet" } },
+      { "question_id": "q.optional_terms.v1", "answer": { "kind": "option", "option_id": "none" } }
+    ],
+    "after_answers": {
+      "revision": 5,
+      "field_states": {
+        "landlord": "valid",
+        "tenants": "valid",
+        "address": "valid",
+        "start_date": "valid",
+        "term_months": "valid",
+        "end_date": "valid",
+        "monthly_rent": "valid",
+        "rent_due_day": "valid",
+        "deposit": "valid",
+        "pets": "valid",
+        "smoking": "valid",
+        "furnished": "valid",
+        "utilities": "valid",
+        "guarantor": "none_confirmed",
+        "break_month": "none_confirmed"
+      },
+      "field_values": {
+        "landlord": "Sam Vale",
+        "tenants": ["Priya Reed", "Joe Lake"],
+        "address": "12 Willow Lane",
+        "start_date": "2027-04-03",
+        "term_months": 12,
+        "end_date": "2028-04-02",
+        "monthly_rent": 125000,
+        "rent_due_day": 1,
+        "deposit": 120000,
+        "pets": "with_consent",
+        "smoking": "prohibited",
+        "furnished": "furnished",
+        "utilities": ["electricity", "gas", "internet"]
+      },
+      "field_methods": {
+        "landlord": "mock",
+        "tenants": "mock",
+        "address": "mock",
+        "start_date": "user_answer",
+        "term_months": "mock",
+        "end_date": "computed",
+        "monthly_rent": "user_answer",
+        "rent_due_day": "mock",
+        "deposit": "mock",
+        "pets": "mock",
+        "smoking": "mock",
+        "furnished": "mock",
+        "utilities": "user_answer",
+        "guarantor": "none_confirmed",
+        "break_month": "none_confirmed"
+      },
+      "questions": [],
+      "clause_ids": [
+        "parties",
+        "joint-and-several",
+        "property",
+        "furnished-inventory",
+        "term",
+        "rent",
+        "rent-payment",
+        "utilities-tenant-pays",
+        "utilities-included-in-rent",
+        "deposit",
+        "deposit-return",
+        "use-of-property",
+        "pets-with-landlord-consent",
+        "smoking-prohibited",
+        "repairs-tenant",
+        "repairs-landlord",
+        "access-with-notice",
+        "quiet-enjoyment",
+        "ending-tenancy",
+        "notices"
+      ],
+      "not_included": [
+        { "reason": "no_supported_clause", "clause_id": null, "quote": "Can the landlord enter without notice", "pointer": "msg:m4:27-64" }
+      ],
+      "markdown_contains": [
+        "This agreement is made between Sam Vale (the Landlord) and Priya Reed and Joe Lake (the Tenant).",
+        "The tenancy is for a fixed term of 12 months, starting on 3 April 2027 and ending on 2 April 2028.",
+        "The rent is £1,250.00 per month.",
+        "The Tenant will pay a deposit of £1,200.00 before the tenancy starts.",
+        "the tenancy: electricity, gas and internet.",
+        "paid for by the Landlord: water.",
+        "1 request was not included; see provenance file."
+      ],
+      "markdown_excludes": [
+        "enter without notice",
+        "03/04/2027",
+        "GBP 1250",
+        "GBP 1200",
+        "Utilities: water included",
+        "due day 1"
+      ]
+    }
+  }
+}

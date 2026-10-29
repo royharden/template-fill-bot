@@ -1,0 +1,1 @@
+{"id":"adversarial-extra-keys","messages":[{"id":"m1","text":"Landlord: Aster Vale."}],"output":{"fields":[],"requests":[],"agreement":"The tenant must pay an invented fee."},"expected":{"diagnostic":"dropped_keys"}}

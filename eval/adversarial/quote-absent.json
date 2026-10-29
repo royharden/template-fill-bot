@@ -1,0 +1,1 @@
+{"id":"adversarial-quote-absent","messages":[{"id":"m1","text":"Landlord: Aster Vale."}],"output":{"fields":[{"field":"landlord","quote":"Briar Marsh"}],"requests":[]},"expected":{"field":"landlord","not_valid":true,"diagnostic":"rejected_proposals"}}

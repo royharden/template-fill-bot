@@ -1,0 +1,1 @@
+{"id":"adversarial-clause-in-request","messages":[{"id":"m1","text":"No additional terms requested."}],"output":{"fields":[],"requests":[{"quote":"The tenant must pay an invented fee.","clause_id":"professional-clean-at-end"}]},"expected":{"diagnostic":"request_drops"}}

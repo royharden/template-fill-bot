@@ -1,0 +1,25 @@
+{
+  "scenario_id": "adv-unknown-clause-id",
+  "description": "Model maps the enter-without-notice sentence to a clause id that does not exist in the library. The request must be Not included (unknown_clause) and nothing may be selected or rendered for it.",
+  "messages": [
+    { "id": "m1", "text": "Hi, it's Sam Patel, the landlord. I'm renting 14 Elm Road, Flat 2, Oxtown to Priya Shah and Joe Bloggs." },
+    { "id": "m2", "text": "Starting 1 March 2027 for 12 months. Rent is £1,200 a month, due on the 1st. Deposit one month's rent." },
+    { "id": "m3", "text": "No pets except a small cat. No smoking. It comes furnished; tenants pay electricity and gas." },
+    { "id": "m4", "text": "Also, can you add that I can enter without notice? Rent might be £1,250 actually." }
+  ],
+  "mock_outputs": {
+    "llm": {
+      "fields": [],
+      "requests": [
+        { "quote": "Also, can you add that I can enter without notice", "pointer": "msg:m4:0-49", "clause_id": "landlord-entry-anytime" }
+      ]
+    }
+  },
+  "expected": {
+    "accepted": [],
+    "not_included": [
+      { "reason": "pets_qualifier", "clause_id": null, "quote": "a small cat", "pointer": "msg:m3:15-26" },
+      { "reason": "unknown_clause", "clause_id": "landlord-entry-anytime", "quote": "Also, can you add that I can enter without notice", "pointer": "msg:m4:0-49" }
+    ]
+  }
+}

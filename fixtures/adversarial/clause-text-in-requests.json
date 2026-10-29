@@ -1,0 +1,33 @@
+{
+  "scenario_id": "adv-clause-text-in-requests",
+  "description": "Model smuggles clause text through requests: a quote that is not in the intake (no pointer), a quote whose pointer resolves to different text, and a real sentence mapped to a mandatory (non-requestable) clause. The first two are dropped without keeping their text; the third is Not included (not_requestable).",
+  "messages": [
+    { "id": "m1", "text": "Hi, it's Sam Patel, the landlord. I'm renting 14 Elm Road, Flat 2, Oxtown to Priya Shah and Joe Bloggs." },
+    { "id": "m2", "text": "Starting 1 March 2027 for 12 months. Rent is £1,200 a month, due on the 1st. Deposit one month's rent." },
+    { "id": "m3", "text": "No pets except a small cat. No smoking. It comes furnished; tenants pay electricity and gas." },
+    { "id": "m4", "text": "Also, can you add that I can enter without notice? Rent might be £1,250 actually." }
+  ],
+  "mock_outputs": {
+    "llm": {
+      "fields": [],
+      "requests": [
+        { "quote": "The Landlord may enter the Property at any time without notice", "clause_id": "access-with-notice" },
+        { "quote": "The Tenant waives every right under this agreement", "pointer": "msg:m1:0-10", "clause_id": null },
+        { "quote": "No smoking", "pointer": "msg:m3:28-38", "clause_id": "access-with-notice" }
+      ]
+    }
+  },
+  "expected": {
+    "request_drops": [
+      { "index": 0, "reason": "ungrounded:not_found" },
+      { "index": 1, "reason": "ungrounded:quote_mismatch" }
+    ],
+    "not_included": [
+      { "reason": "pets_qualifier", "clause_id": null, "quote": "a small cat", "pointer": "msg:m3:15-26" },
+      { "reason": "not_requestable", "clause_id": "access-with-notice", "quote": "No smoking", "pointer": "msg:m3:28-38" },
+      { "reason": "no_supported_clause", "clause_id": null, "quote": "Also, can you add that I can enter without notice", "pointer": "msg:m4:0-49" }
+    ],
+    "accepted": [],
+    "text_never_present": ["at any time without notice", "waives every right"]
+  }
+}

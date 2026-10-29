@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "state": "pending",
+  "seed": 3007,
+  "proposal": { "generated": 40, "handtraps": 20, "dev": 30, "heldout": 30 },
+  "generated_count": 0,
+  "handtrap_count": 20,
+  "entries": [],
+  "sources": {},
+  "protocol_hash": null,
+  "frozen_at": null,
+  "digest": null,
+  "note": "NOT GENERATED, NOT FROZEN, NOT MEASURED. The 20 authored trap files are source data; no scenario generator or evaluator has run."
+}

@@ -1,0 +1,29 @@
+{
+  "scenario_id": "adv-value-not-quote",
+  "description": "Model values disagree with their own (correctly grounded) quotes. The value is re-derived from the quote; the disagreement makes the field invalid (value_quote_mismatch) and the model value is never used.",
+  "messages": [
+    { "id": "m1", "text": "Hi, it's Sam Patel, the landlord. I'm renting 14 Elm Road, Flat 2, Oxtown to Priya Shah and Joe Bloggs." },
+    { "id": "m2", "text": "Starting 1 March 2027 for 12 months. Rent is £1,200 a month, due on the 1st. Deposit one month's rent." },
+    { "id": "m3", "text": "No pets except a small cat. No smoking. It comes furnished; tenants pay electricity and gas." },
+    { "id": "m4", "text": "Also, can you add that I can enter without notice? Rent might be £1,250 actually." }
+  ],
+  "mock_outputs": {
+    "llm": {
+      "fields": [
+        { "field": "monthly_rent", "value": 500, "quote": "£1,200 a month", "pointer": "msg:m2:45-59" },
+        { "field": "landlord", "value": "Joe Bloggs", "quote": "Sam Patel", "pointer": "msg:m1:9-18" },
+        { "field": "term_months", "value": 24, "quote": "12 months", "pointer": "msg:m2:26-35" },
+        { "field": "smoking", "value": "permitted_outside", "quote": "No smoking", "pointer": "msg:m3:28-38" }
+      ],
+      "requests": []
+    }
+  },
+  "expected": {
+    "fields": {
+      "monthly_rent": { "state": "invalid", "reasons": ["value_quote_mismatch"] },
+      "landlord": { "state": "invalid", "reasons": ["value_quote_mismatch"] },
+      "term_months": { "state": "invalid", "reasons": ["value_quote_mismatch"] },
+      "smoking": { "state": "invalid", "reasons": ["value_quote_mismatch"] }
+    }
+  }
+}

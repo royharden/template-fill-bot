@@ -1,0 +1,7 @@
+{
+  "imports": {
+    "zod": "npm:zod@3.23.8",
+    "fflate": "npm:fflate@0.8.2",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2.45.4"
+  }
+}

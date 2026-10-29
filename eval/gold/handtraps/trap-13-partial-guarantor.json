@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "id": "trap-13-partial-guarantor",
+  "base_id": "trap-13-partial-guarantor",
+  "stratum": "handtrap",
+  "origin": "handtrap",
+  "author": "S30 project authors (0576 Codex)",
+  "licence": "MIT",
+  "messages": [
+    {
+      "id": "m1",
+      "text": "Landlord: Aster Vale. Tenants: Briar Reed. Property: 42 Lantern Lane."
+    },
+    {
+      "id": "m2",
+      "text": "Start date: 2027-03-01. Term: 12 months. Monthly rent: GBP 1200. Rent due day: 1. Deposit: GBP 1200. No pets. Smoking prohibited. Unfurnished. Tenants pay water, electricity, gas and internet. Guarantor: Mira Marsh for Briar Reed only. Break clause after month 6."
+    }
+  ],
+  "expected": {
+    "fields": {
+      "landlord": {
+        "state": "valid",
+        "value": "Aster Vale"
+      },
+      "tenants": {
+        "state": "valid",
+        "value": [
+          "Briar Reed"
+        ]
+      },
+      "address": {
+        "state": "valid",
+        "value": "42 Lantern Lane"
+      },
+      "start_date": {
+        "state": "valid",
+        "value": "2027-03-01"
+      },
+      "term_months": {
+        "state": "valid",
+        "value": 12
+      },
+      "end_date": {
+        "state": "valid",
+        "value": "2028-02-29"
+      },
+      "monthly_rent": {
+        "state": "valid",
+        "value": 120000
+      },
+      "rent_due_day": {
+        "state": "valid",
+        "value": 1
+      },
+      "deposit": {
+        "state": "valid",
+        "value": 120000
+      },
+      "pets": {
+        "state": "valid",
+        "value": "none"
+      },
+      "smoking": {
+        "state": "valid",
+        "value": "prohibited"
+      },
+      "furnished": {
+        "state": "valid",
+        "value": "unfurnished"
+      },
+      "utilities": {
+        "state": "valid",
+        "value": [
+          "water",
+          "electricity",
+          "gas",
+          "internet"
+        ]
+      },
+      "guarantor": {
+        "state": "ambiguous"
+      },
+      "break_month": {
+        "state": "valid",
+        "value": 6
+      }
+    },
+    "required_questions": [],
+    "optional_confirmation": false,
+    "clause_ids": null,
+    "unsupported_quotes": [
+      "for Briar Reed only"
+    ],
+    "render_blocked": true
+  },
+  "tags": [
+    "synthetic",
+    "trap",
+    "partial-guarantor",
+    "optional-cue"
+  ]
+}
